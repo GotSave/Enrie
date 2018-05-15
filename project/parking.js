@@ -2,13 +2,14 @@ class Parking
 {
 	constructor(n)
 	{
+        this.nbrSpot = 0;
 		this.walls = new Group();
 		
 		this.wallWidth = 1000;
 		this.wallHeight = 500;
 		
 		this.spotNumber = n;
-		this.maxSpots = 5; // a changer en fonction de l'evolution du parking
+		this.maxSpots = 13; // a changer en fonction de l'evolution du parking
 		this.spots = [];
 		
 		this.spotWidth = 211;
@@ -25,6 +26,14 @@ class Parking
 		const horizontalWallImage = loadImage("./assets/horizontalWall.png");
 		const entryWall = loadImage("./assets/entryWall.png");
 		
+        let hallWayRightWall = createSprite((3 / 8) * this.wallWidth, this.wallHeight *( 3/2) );
+		hallWayRightWall.addImage("normal", verticalWallImage);
+		this.walls.add(hallWayRightWall);
+        
+        let hallWayLeftWall = createSprite((5 / 8) * this.wallWidth, this.wallHeight * (3/2));
+		hallWayLeftWall.addImage("normal",verticalWallImage);
+		this.walls.add(hallWayLeftWall);
+        
 		let upWall = createSprite(this.wallWidth / 2, 0);
 		upWall.addImage("normal", horizontalWallImage);
 		this.walls.add(upWall);
@@ -37,11 +46,11 @@ class Parking
 		rightWall.addImage("normal", verticalWallImage);
 		this.walls.add(rightWall);
 		
-		let leftEntryWall = createSprite(this.wallWidth / 8, this.wallHeight);
+		let leftEntryWall = createSprite((2/11) *this.wallWidth , this.wallHeight);
 		leftEntryWall.addImage("normal", entryWall);
 		this.walls.add(leftEntryWall);
 		
-		let rightEntryWall = createSprite((7 / 8) * this.wallWidth, this.wallHeight);
+		let rightEntryWall = createSprite((9/11) * this.wallWidth, this.wallHeight);
 		rightEntryWall.addImage("normal", entryWall);
 		this.walls.add(rightEntryWall);
 	}
@@ -53,9 +62,16 @@ class Parking
 	
 	createRandomSpots()
 	{
-		for(let i = 0; i < this.maxSpots; i++)
-			this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
-		
+        for(let l = 0 ; l < 3 ; l++)
+        {
+            if(l === 1)
+                this.nbrSpot = 3;
+            else 
+                this.nbrSpot = 5;
+            for(let i = 0; i < this.nbrSpot; i++)
+			     this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
+            this.spotWidth = this.spotWidth + 790;
+        }
 		let picked = [];
 		while(picked.length != this.spotNumber)
 		{
