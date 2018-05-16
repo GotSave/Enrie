@@ -69,7 +69,7 @@ class Parking
 			if(!picked.includes(randomSpot))
 			{
 				picked.push(randomSpot)
-				this.spots[randomSpot].active = true;
+				this.spots[randomSpot].available = true;
 			}		
 		}
 		

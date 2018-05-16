@@ -13,6 +13,13 @@ class Car
 		this.blocked = false;
 		this.parked = false;
 		
+		this.wMin = -650;
+		this.wMax = 1120;
+		
+		this.hMax = 1450;
+		
+		this.brain = new NeuralNetwork(10, 10, 4);
+		
 		this.createSprite(x, y);
 	}
 	
@@ -33,6 +40,39 @@ class Car
 		this.sensors[3] = createVector(this.sprite.position.x - this.sprite.width / 2, this.sprite.position.y - this.sprite.height / 2);
 	}
 	
+	think(spot)
+	{		
+		let inputs = [];
+		inputs[0] = (this.sensors[0].x - this.wMin) / (-this.wMin + this.wMax);
+		inputs[1] = this.sensors[0].y / this.hMax;
+		inputs[2] = (this.sensors[1].x - this.wMin) / (-this.wMin + this.wMax);
+		inputs[3] = this.sensors[1].y / this.hMax;
+		inputs[4] = (this.sensors[2].x - this.wMin) / (-this.wMin + this.wMax);
+		inputs[5] = this.sensors[2].y / this.hMax;
+		inputs[6] = (this.sensors[3].x - this.wMin) / (-this.wMin + this.wMax);
+		inputs[7] = this.sensors[3].y / this.hMax;
+		inputs[8] = (spot.sprite.position.x - this.wMin) / (-this.wMin + this.wMax);
+		inputs[9] = spot.sprite.position.y / this.hMax;
+		
+		let outputs = this.brain.predict(inputs);
+		
+		if(outputs[0] > 0.5)
+			this.goForward();
+		if(outputs[1] > 0.5)
+			this.goRight();
+		if(outputs[2] > 0.5)
+			this.goBackward();
+		if(outputs[3] > 0.5)
+			this.goLeft();
+	}
+	
+	chooseSpot(spots)
+	{
+		for(let i = 0; i < spots.length; i++)
+			if(spots[i].available)
+				return spots[i];
+	}
+	
 	checkBlocked(walls)
 	{
 		if(this.sprite.collide(walls))
@@ -51,7 +91,7 @@ class Car
 	checkUnavailableSpot(spots)
 	{
 		for(let i = 0; i < spots.length; i++)
-            if(!spots[i].active && this.sprite.collide(spots[i].sprite))
+            if(!spots[i].available && this.sprite.collide(spots[i].sprite))
 				this.blocked = true;
 	}
     
@@ -109,37 +149,46 @@ class Car
         this.parked = true;
 	}
 	
-	moveCamera()
+	/*moveCamera()
 	{
 		camera.position.x = this.sprite.position.x;
 		camera.position.y = this.sprite.position.y;
-	}  
+	}*/
+	
+	goLeft() 		{ this.sprite.rotation -= 2; }
+	goRight()		{ this.sprite.rotation += 2; }
+	goBackward() 	{ this.acceleration -= 3; }
+	goForward()		{ this.acceleration += 3; }
 	
 	move(walls, spots, cars)
 	{
-		this.moveCamera();
+		//this.moveCamera();
 		
 		this.checkBlocked(walls);
 		this.checkCollision(cars);
 		this.checkUnavailableSpot(spots);
+		
         this.checkSensors(spots);
         this.showSensors();
+		
         this.checkParked();
 		
 		if(!this.blocked && !this.parked)
 		{
-			if(keyDown(UP_ARROW)) 
-				this.acceleration += 3;				
+			/*if(keyDown(UP_ARROW)) 
+				this.goForward();		
 			if(keyDown(DOWN_ARROW))   
-				this.acceleration -= 3;
+				this.goBackward();
 			
 			if(this.acceleration < -30 || this.acceleration > 30) 
 			{
 				if(keyDown(LEFT_ARROW))
-                    this.sprite.rotation -= 2;
+                    this.goLeft();
 				if(keyDown(RIGHT_ARROW))
-					this.sprite.rotation += 2;
-			}
+					this.goRight();
+			}*/
+			
+			this.think(this.chooseSpot(spots));
 			
 			if(this.acceleration > 0)   
 				this.acceleration -= 1.5;

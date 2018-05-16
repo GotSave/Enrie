@@ -7,14 +7,14 @@ class Spot
 		this.x = x;
 		this.y = y;
 		
-		this.active = false;
+		this.available = false;
 	}
 	
 	init()
 	{
 		let spotImage;
 		
-		if(this.active)
+		if(this.available)
 			spotImage = loadImage("./assets/availableSpot.png");
 		else
 			spotImage = loadImage("./assets/unavailableSpot.png");
