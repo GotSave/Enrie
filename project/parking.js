@@ -2,62 +2,47 @@ class Parking
 {
 	constructor(n)
 	{
-        this.nbrSpot = 0;
-		this.walls = new Group();
-		
 		this.wallWidth = 1000;
 		this.wallHeight = 500;
+
+		this.wallsSprite = [];
+		this.walls = new Group();
+		this.wallsInfos = new Array();
+		for(let i = 0; i < 3; i++)
+		   this.wallsInfos[i] = new Array();
 		
 		this.spotNumber = n;
-		this.maxSpots = 13; // a changer en fonction de l'evolution du parking
+		this.nbrSpot = 0;
+		this.maxSpots = 12;
 		this.spots = [];
 		
 		this.spotWidth = 211;
 		this.spotHeight = 100;
 		
 		this.createWalls();
-		this.createObstacles();
 		this.createRandomSpots();
 	}
 	
 	createWalls()
 	{
-		const verticalWallImage = loadImage("./assets/verticalWall.png");
-		const horizontalWallImage = loadImage("./assets/horizontalWall.png");
-		const entryWall = loadImage("./assets/entryWall.png");
+		const verticalWallImage = "./assets/verticalWall.png";
+		const horizontalWallImage = "./assets/horizontalWall.png";
+		const entryWallImage = "./assets/entryWall.png";
+		const entryDownWallImage = "./assets/entryDownWall.png";
+		const smallVerticalWallImage = "./assets/smallVerticalWall.png";
 		
-        let hallWayRightWall = createSprite((3 / 8) * this.wallWidth, this.wallHeight *( 3/2) );
-		hallWayRightWall.addImage("normal", verticalWallImage);
-		this.walls.add(hallWayRightWall);
-        
-        let hallWayLeftWall = createSprite((5 / 8) * this.wallWidth, this.wallHeight * (3/2));
-		hallWayLeftWall.addImage("normal",verticalWallImage);
-		this.walls.add(hallWayLeftWall);
-        
-		let upWall = createSprite(this.wallWidth / 2, 0);
-		upWall.addImage("normal", horizontalWallImage);
-		this.walls.add(upWall);
+		this.wallsInfos = [
+			[0.5, -0.63, 1.62, -0.125, 1.12, 0.375, 0.625, -0.175, 1.175, 0.32, 0.68, 0.5, 0, 1, 0.13, 0.87],
+			[3, 2.25, 2.25, 2.5, 2.5, 2.75, 2.75, 2, 2, 1.5, 1.5, 0, 0.5, 0.5, 1, 1],
+			[entryDownWallImage, smallVerticalWallImage, smallVerticalWallImage, horizontalWallImage, horizontalWallImage, smallVerticalWallImage, smallVerticalWallImage, horizontalWallImage, horizontalWallImage, verticalWallImage, verticalWallImage, horizontalWallImage, verticalWallImage, verticalWallImage, entryWallImage, entryWallImage]
+		];
 		
-		let leftWall = createSprite(0, this.wallHeight / 2);
-		leftWall.addImage("normal", verticalWallImage);
-		this.walls.add(leftWall);
-		
-		let rightWall = createSprite(this.wallWidth, this.wallHeight / 2);
-		rightWall.addImage("normal", verticalWallImage);
-		this.walls.add(rightWall);
-		
-		let leftEntryWall = createSprite((2/11) *this.wallWidth , this.wallHeight);
-		leftEntryWall.addImage("normal", entryWall);
-		this.walls.add(leftEntryWall);
-		
-		let rightEntryWall = createSprite((9/11) * this.wallWidth, this.wallHeight);
-		rightEntryWall.addImage("normal", entryWall);
-		this.walls.add(rightEntryWall);
-	}
-	
-	createObstacles()
-	{
-	
+		for(let i = 0; i < 16; i++)
+		{
+			this.wallsSprite.push(createSprite(this.wallsInfos[0][i] * this.wallWidth, this.wallsInfos[1][i] * this.wallHeight));
+			this.wallsSprite[i].addImage("normal", loadImage(this.wallsInfos[2][i]));
+			this.walls.add(this.wallsSprite[i]);
+		}
 	}
 	
 	createRandomSpots()
@@ -65,11 +50,16 @@ class Parking
         for(let l = 0 ; l < 3 ; l++)
         {
             if(l === 1)
-                this.nbrSpot = 3;
+                this.nbrSpot = 2;
             else 
                 this.nbrSpot = 5;
-            for(let i = 0; i < this.nbrSpot; i++)
-			     this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
+            
+			for(let i = 0; i < this.nbrSpot; i++)
+				if(l === 1)
+					this.spots.push(new Spot(this.spotWidth / 2, (i + 1) * this.spotHeight + this.spotHeight / 2 + 50));
+				else
+					this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
+					
             this.spotWidth = this.spotWidth + 790;
         }
 		let picked = [];

@@ -1,6 +1,6 @@
 class Car
 {
-	constructor()
+	constructor(x, y)
 	{
 		this.sprite;
 		
@@ -13,14 +13,14 @@ class Car
 		this.blocked = false;
 		this.parked = false;
 		
-		this.createSprite();
+		this.createSprite(x, y);
 	}
 	
-	createSprite()
+	createSprite(x, y)
 	{
 		const carImage = loadImage("./assets/car.png");
 		
-		this.sprite = createSprite(width / 2, height / 2);
+		this.sprite = createSprite(x, y);
 		this.sprite.addImage("normal", carImage);
 		
 		this.sprite.maxSpeed = 100000;
@@ -38,6 +38,22 @@ class Car
 		if(this.sprite.collide(walls))
 			this.blocked = true;
 	}
+	
+	checkCollision(cars)
+	{
+		for(let i = 0; i < cars.length; i++)
+		{
+			if(this.sprite.collide(cars[i].sprite))
+				this.blocked = true;
+		}
+	}
+	
+	checkUnavailableSpot(spots)
+	{
+		for(let i = 0; i < spots.length; i++)
+            if(!spots[i].active && this.sprite.collide(spots[i].sprite))
+				this.blocked = true;
+	}
     
     checkSensors(spots)
 	{
@@ -51,9 +67,7 @@ class Car
                     break;
                 }
                 else
-                {
                     this.activatedSensors[i] = -1;
-                }
             }
         }
 	}
@@ -101,11 +115,13 @@ class Car
 		camera.position.y = this.sprite.position.y;
 	}  
 	
-	move(walls, spots)
+	move(walls, spots, cars)
 	{
 		this.moveCamera();
 		
 		this.checkBlocked(walls);
+		this.checkCollision(cars);
+		this.checkUnavailableSpot(spots);
         this.checkSensors(spots);
         this.showSensors();
         this.checkParked();
