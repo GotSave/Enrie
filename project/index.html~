@@ -11,7 +11,6 @@
         <script src="./lib/nn/matrix.js"></script>
         <script src="./lib/nn/nn.js"></script>  
         
-        <script src="ga.js"></script>
         <script src="spot.js"></script>
         <script src="parking.js"></script>
         <script src="car.js"></script>

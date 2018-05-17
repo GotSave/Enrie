@@ -1,18 +1,6 @@
-function mutate(x)
-{
-    if(random(1) < 0.1)
-    {
-        let offset = randomGaussian() * 0.5;
-        let newX = x + offset;
-        return newX;
-    }
-    else
-        return x;
-}
-
 class Car
 {
-	constructor(x, y, spots, brain)
+	constructor(x, y)
 	{
 		this.sprite;
 		
@@ -24,25 +12,13 @@ class Car
 		
 		this.blocked = false;
 		this.parked = false;
-		this.loop = true;
 		
 		this.wMin = -650;
 		this.wMax = 1120;
 		
 		this.hMax = 1450;
-        
-        this.fitness = 0;
-        this.score = 0;
 		
-        if(brain)
-        {
-            this.brain = brain.copy();
-            this.brain.mutate(mutate);
-        }
-        else
-            this.brain = new NeuralNetwork(10, 10, 4);
-        
-        this.target = this.chooseSpot(spots);
+		this.brain = new NeuralNetwork(10, 10, 4);
 		
 		this.createSprite(x, y);
 	}
@@ -96,16 +72,6 @@ class Car
 			if(spots[i].available)
 				return spots[i];
 	}
-    
-    distToSpot(spot)
-    {
-        let dX = abs(((this.sprite.position.x - spot.sprite.position.x) - this.wMin) / (-this.wMin + this.wMax));
-        let dY = abs((this.sprite.position.y - spot.sprite.position.y) / this.hMax);
-        
-        let d = dX + dY;
-        
-        return d;
-    }
 	
 	checkBlocked(walls)
 	{
@@ -183,22 +149,23 @@ class Car
         this.parked = true;
 	}
 	
+	/*moveCamera()
+	{
+		camera.position.x = this.sprite.position.x;
+		camera.position.y = this.sprite.position.y;
+	}*/
+	
 	goLeft() 		{ this.sprite.rotation -= 2; }
 	goRight()		{ this.sprite.rotation += 2; }
 	goBackward() 	{ this.acceleration -= 3; }
 	goForward()		{ this.acceleration += 3; }
-    
-    /* TODO: trouver bonne fonction pour adapter le score en fonction de la distance a la place */
-    setScore(x)
-    {
-        this.score += (1 / Math.sqrt(2 * PI) * Math.exp((-x * x) / 2));
-    }
 	
-	move(walls, spots, carsGroup1, carsGroup2)
-	{		
+	move(walls, spots, cars)
+	{
+		//this.moveCamera();
+		
 		this.checkBlocked(walls);
-		this.checkCollision(carsGroup1);
-		this.checkCollision(carsGroup2);
+		this.checkCollision(cars);
 		this.checkUnavailableSpot(spots);
 		
         this.checkSensors(spots);
@@ -207,21 +174,26 @@ class Car
         this.checkParked();
 		
 		if(!this.blocked && !this.parked)
-		{			
+		{
+			/*if(keyDown(UP_ARROW)) 
+				this.goForward();		
+			if(keyDown(DOWN_ARROW))   
+				this.goBackward();
 			
-            this.think(this.target);
-            this.setScore(this.distToSpot(this.target));
+			if(this.acceleration < -30 || this.acceleration > 30) 
+			{
+				if(keyDown(LEFT_ARROW))
+                    this.goLeft();
+				if(keyDown(RIGHT_ARROW))
+					this.goRight();
+			}*/
+			
+			this.think(this.chooseSpot(spots));
 			
 			if(this.acceleration > 0)   
 				this.acceleration -= 1.5;
 			if(this.acceleration < 0)   
 				this.acceleration += 1.5;
-				
-			/* TODO: ameliorer ca et le timer */
-            if(this.acceleration > 0 || this.sprite.velocity > 0)
-				this.loop = false;
-			else
-				this.loop = true;
 			
 			this.sprite.addSpeed(this.acceleration, this.sprite.rotation);
             
