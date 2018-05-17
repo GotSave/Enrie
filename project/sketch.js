@@ -1,4 +1,4 @@
-const TOTAL = 75;
+const TOTAL = 150;
 
 let leftCars = [];
 let bottomCars = [];
@@ -24,7 +24,7 @@ function setup()
 	camera.position.x = width / 2 - 300;
 	camera.position.y = height / 2 + 300;
     
-	parking = new Parking(9);
+	parking = new Parking(10);
 	
 	for(let i = 0; i < TOTAL; i++)
 	{
@@ -45,7 +45,7 @@ function draw()
 
 	while(loop)
 	{
-		for(cycle = 0; cycle < 500; cycle++)		
+		for(cycle = 0; cycle < 250; cycle++)		
 			iterate();
 		loop = false;
 	}

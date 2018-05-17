@@ -39,3 +39,23 @@ function pickOne(x, y, savedCars, spots)
     
     return child;
 }
+
+// peut etre utile pour trouver best fitness
+/*function searchBetter(savedCars, picked)
+{
+    let best = null;
+    let index = 0;
+    
+    for(let i = 0; i < savedCars.length; i++)
+    {
+        if(!picked.includes(i) && savedCars[i].fitness > best)
+        {
+            best = savedCars[i].fitness;
+            index = i;
+        }
+    }
+    
+    picked.push(index);
+    
+    return index;
+}*/
