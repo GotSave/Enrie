@@ -42,7 +42,7 @@ class Car
 				this.brain.mutate(mutate);
         }
         else
-            this.brain = new NeuralNetwork(10, 10, 4);
+            this.brain = new NeuralNetwork(10, 15, 4);
         
 		this.lastDistance;
         this.target = this.chooseSpot(spots);
@@ -207,7 +207,7 @@ class Car
     }
 	
 	move(walls, spots, carGroup1, carGroup2)
-	{		
+	{
 		this.checkBlocked(walls);
 		this.checkCollision(carGroup1);
 		this.checkCollision(carGroup2);

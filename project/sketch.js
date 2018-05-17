@@ -24,7 +24,7 @@ function setup()
 	camera.position.x = width / 2 - 300;
 	camera.position.y = height / 2 + 300;
     
-	parking = new Parking(5);
+	parking = new Parking(9);
 	
 	for(let i = 0; i < TOTAL; i++)
 	{
@@ -45,7 +45,7 @@ function draw()
 
 	while(loop)
 	{
-		for(cycle = 0; cycle < 200; cycle++)		
+		for(cycle = 0; cycle < 500; cycle++)		
 			iterate();
 		loop = false;
 	}
