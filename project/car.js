@@ -24,10 +24,11 @@ class Car
 		
 		this.blocked = false;
 		this.parked = false;
-		this.loop = true;
+		this.loop = false;
+		this.noMove = false;
 		
-		this.wMin = -650;
-		this.wMax = 1120;
+		this.wMin = -600;
+		this.wMax = 1600;
 		
 		this.hMax = 1450;
         
@@ -37,11 +38,13 @@ class Car
         if(brain)
         {
             this.brain = brain.copy();
-            this.brain.mutate(mutate);
+			if(random(1) > 0.3)
+				this.brain.mutate(mutate);
         }
         else
             this.brain = new NeuralNetwork(10, 10, 4);
         
+		this.lastDistance;
         this.target = this.chooseSpot(spots);
 		
 		this.createSprite(x, y);
@@ -62,6 +65,8 @@ class Car
 		this.sensors[1] = createVector(this.sprite.position.x + this.sprite.width / 2, this.sprite.position.y - this.sprite.height / 2);
 		this.sensors[2] = createVector(this.sprite.position.x - this.sprite.width / 2, this.sprite.position.y + this.sprite.height / 2);
 		this.sensors[3] = createVector(this.sprite.position.x - this.sprite.width / 2, this.sprite.position.y - this.sprite.height / 2);
+		
+		this.lastDistance = this.distToSpot(this.target);
 	}
 	
 	think(spot)
@@ -88,6 +93,9 @@ class Car
 			this.goBackward();
 		if(outputs[3] > 0.5)
 			this.goLeft();
+		
+		if((outputs[0] < 0.5 && outputs[2] < 0.5) || (outputs[1] < 0.5 && outputs[3] < 0.5))
+			this.blocked = true;
 	}
 	
 	chooseSpot(spots)
@@ -99,10 +107,10 @@ class Car
     
     distToSpot(spot)
     {
-        let dX = abs(((this.sprite.position.x - spot.sprite.position.x) - this.wMin) / (-this.wMin + this.wMax));
-        let dY = abs((this.sprite.position.y - spot.sprite.position.y) / this.hMax);
+		let left = ((spot.sprite.position.x - this.wMin) / (-this.wMin + this.wMax)) - ((this.sprite.position.x - this.wMin) / (-this.wMin + this.wMax));
+        let right = (spot.sprite.position.y / this.hMax) - (this.sprite.position.y / this.hMax);
         
-        let d = dX + dY;
+        let d = Math.sqrt((left * left) + (right * right));
         
         return d;
     }
@@ -113,12 +121,15 @@ class Car
 			this.blocked = true;
 	}
 	
-	checkCollision(cars)
+	checkCollision(car)
 	{
-		for(let i = 0; i < cars.length; i++)
+		if(car)
 		{
-			if(this.sprite.collide(cars[i].sprite))
+			if(this.sprite.collide(car.sprite))
+			{
 				this.blocked = true;
+				car.blocked = true;
+			}
 		}
 	}
 	
@@ -181,6 +192,8 @@ class Car
             return;
         
         this.parked = true;
+		console.log("garé !!");
+		this.score = 1;
 	}
 	
 	goLeft() 		{ this.sprite.rotation -= 2; }
@@ -188,21 +201,33 @@ class Car
 	goBackward() 	{ this.acceleration -= 3; }
 	goForward()		{ this.acceleration += 3; }
     
-    /* TODO: trouver bonne fonction pour adapter le score en fonction de la distance a la place */
     setScore(x)
     {
-        this.score += (1 / Math.sqrt(2 * PI) * Math.exp((-x * x) / 2));
+        this.score = (1 / (Math.sqrt(0.2) * Math.sqrt(2 * PI))) * Math.exp((-1 / 2) * ((x / 0.2) * (x / 0.2)));
     }
 	
-	move(walls, spots, carsGroup1, carsGroup2)
+	move(walls, spots, carGroup1, carGroup2)
 	{		
 		this.checkBlocked(walls);
-		this.checkCollision(carsGroup1);
-		this.checkCollision(carsGroup2);
+		this.checkCollision(carGroup1);
+		this.checkCollision(carGroup2);
 		this.checkUnavailableSpot(spots);
 		
+		if(this.sprite.position.x > this.wMax || this.sprite.position.x < this.wMin)
+			this.blocked = true;
+		if(this.sprite.position.y > this.hMax || this.sprite.position.y < 0)
+			this.blocked = true;
+		
+		if(this.sprite.rotation > 500 || this.sprite.rotation < -500)
+			this.loop = true;
+		
+		if(this.lastDistance === this.distToSpot(this.target))
+			this.noMove = true;
+		else
+			this.noMove = false;
+		
         this.checkSensors(spots);
-        this.showSensors();
+		//this.showSensors();
 		
         this.checkParked();
 		
@@ -216,12 +241,6 @@ class Car
 				this.acceleration -= 1.5;
 			if(this.acceleration < 0)   
 				this.acceleration += 1.5;
-				
-			/* TODO: ameliorer ca et le timer */
-            if(this.acceleration > 0 || this.sprite.velocity > 0)
-				this.loop = false;
-			else
-				this.loop = true;
 			
 			this.sprite.addSpeed(this.acceleration, this.sprite.rotation);
             
@@ -230,6 +249,8 @@ class Car
             this.sensors[1] = createVector(this.sprite.position.x + 60 * cos(a + (5 * PI) / 6), this.sprite.position.y + 60 * sin(a + (5 * PI) / 6));
             this.sensors[2] = createVector(this.sprite.position.x + 60 * cos(a + (7 * PI) / 6), this.sprite.position.y + 60 * sin(a + (7 * PI) / 6));
             this.sensors[3] = createVector(this.sprite.position.x + 60 * cos(a + (11 * PI) / 6), this.sprite.position.y + 60 * sin(a + (11 * PI) / 6));
+		
+			this.lastDistance = this.distToSpot(this.target);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-const TOTAL  = 25;
+const TOTAL = 75;
 
 let leftCars = [];
 let bottomCars = [];
@@ -6,12 +6,15 @@ let rightCars = [];
 
 let savedLeftCars = [];
 let savedBottomCars = [];
-let savedRightCars = [];
+//let savedRightCars = [];
 
 let parking;
 
 let startTime, endTime;
 let elapsedTime = 0;
+
+let loop = true;
+let cycle = 0;
 
 function setup()
 {
@@ -30,8 +33,8 @@ function setup()
 		bottomCars.push(new Car(515, 1375, parking.spots));
 		bottomCars[i].sprite.rotation = -90;
 		
-		rightCars.push(new Car(1520, 1125, parking.spots));
-		rightCars[i].sprite.rotation = 180;
+		/*rightCars.push(new Car(1520, 1125, parking.spots));
+		rightCars[i].sprite.rotation = 180;*/
 	}
 	
 	startTime = new Date();
@@ -39,47 +42,54 @@ function setup()
 
 function draw()
 {		
+
+	while(loop)
+	{
+		for(cycle = 0; cycle < 200; cycle++)		
+			iterate();
+		loop = false;
+	}
+	
+	
+	if(cycle >= 149)
+	{
+		iterate();
+		
+		background(55);
+		
+		drawSprites();
+	}
+}
+
+function iterate()
+{
 	endTime = new Date();
 	elapsedTime = endTime - startTime;
 	elapsedTime = new Date(elapsedTime);
-	
-	if(keyDown(UP_ARROW)) 
-		camera.position.y -= 5;
-	if(keyDown(DOWN_ARROW))
-		camera.position.y += 5;
-	if(keyDown(LEFT_ARROW))
-		camera.position.x -= 5;
-	if(keyDown(RIGHT_ARROW))
-		camera.position.x += 5;
-	
-	if(keyWentUp('D'))
-		displayDebug();
-	
-	background(55);
-	
-    drawSprites();
-	
+			
+	/*if(keyWentUp('D'))
+		displayDebug();*/
+					
 	checkProblems(leftCars, savedLeftCars);
 	checkProblems(bottomCars, savedBottomCars);
-	checkProblems(rightCars, savedRightCars);
-			
-			
+	//checkProblems(rightCars, savedRightCars);
+									
 	for(let i = leftCars.length - 1; i >= 0; i--)
-		leftCars[i].move(parking.walls, parking.spots, bottomCars, rightCars);
-			
+		leftCars[i].move(parking.walls, parking.spots, bottomCars[i], rightCars[i]);
+					
 	for(let i = bottomCars.length - 1; i >= 0; i--)
-		bottomCars[i].move(parking.walls, parking.spots, leftCars, rightCars);
+		bottomCars[i].move(parking.walls, parking.spots, leftCars[i], rightCars[i]);
+					
+	/*for(let i = rightCars.length - 1; i >= 0; i--)
+		rightCars[i].move(parking.walls, parking.spots, leftCars[i], bottomCars[i]);*/
 			
-	for(let i = rightCars.length - 1; i >= 0; i--)
-		rightCars[i].move(parking.walls, parking.spots, leftCars, bottomCars);
-	
-	
+			
 	if(leftCars.length === 0 && bottomCars.length === 0 && rightCars.length === 0)
 	{
 		nextGeneration(leftCars, -500, 1140, 0, savedLeftCars, parking.spots);
 		nextGeneration(bottomCars, 515, 1375, -90, savedBottomCars, parking.spots);
-		nextGeneration(rightCars, 1520, 1125, 180, savedRightCars, parking.spots);
-        startTime = endTime;
+		//nextGeneration(rightCars, 1520, 1125, 180, savedRightCars, parking.spots);
+		startTime = endTime;
 	}
 }
 
@@ -87,7 +97,7 @@ function checkProblems(cars, savedCars)
 {
 	for(let i = cars.length - 1; i >= 0; i--)
 	{
-		if(cars[i].blocked || cars[i].parked || (elapsedTime.getSeconds() > 5 && cars[i].loop))
+		if(cars[i].blocked || cars[i].parked || cars[i].loop || (cars[i].noMove && elapsedTime.getSeconds() > 5))
 		{
 			cars[i].sprite.remove();
 			savedCars.push(cars.splice(i, 1)[0]);

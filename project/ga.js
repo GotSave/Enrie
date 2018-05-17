@@ -29,8 +29,7 @@ function pickOne(x, y, savedCars, spots)
     
     while(r > 0)
     {
-        console.log(savedCars[index].fitness);
-        r = r - savedCars[index].fitness;       
+        r = r - savedCars[index].fitness;      
         index++;
     }
     index--;

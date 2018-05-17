@@ -12,8 +12,8 @@ class Parking
 		   this.wallsInfos[i] = new Array();
 		
 		this.spotNumber = n;
-		this.nbrSpot = 0;
-		this.maxSpots = 12;
+		this.nbrSpot = 5;
+		this.maxSpots = 10;
 		this.spots = [];
 		
 		this.spotWidth = 211;
@@ -47,20 +47,12 @@ class Parking
 	
 	createRandomSpots()
 	{
-        for(let l = 0 ; l < 3 ; l++)
-        {
-            if(l === 1)
-                this.nbrSpot = 2;
-            else 
-                this.nbrSpot = 5;
-            
+        for(let l = 0 ; l < 2 ; l++)
+        {            
 			for(let i = 0; i < this.nbrSpot; i++)
-				if(l === 1)
-					this.spots.push(new Spot(this.spotWidth / 2, (i + 1) * this.spotHeight + this.spotHeight / 2 + 50));
-				else
-					this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
+				this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
 					
-            this.spotWidth = this.spotWidth + 790;
+            this.spotWidth = this.spotWidth + 1580;
         }
 		let picked = [];
 		while(picked.length != this.spotNumber)
