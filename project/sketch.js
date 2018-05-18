@@ -13,8 +13,9 @@ let parking;
 let startTime, endTime;
 let elapsedTime = 0;
 
-let loop = true;
-let cycle = 0;
+let nbGeneration = 0;
+let nbLastParked = 0;
+let nbParked = 0;
 
 function setup()
 {
@@ -42,77 +43,58 @@ function setup()
 
 function draw()
 {		
-
-	while(loop)
-	{
-		for(cycle = 0; cycle < 250; cycle++)		
-			iterate();
-		loop = false;
-	}
+    iterate();
+    
+    background(55);
 	
-	
-	if(cycle >= 149)
-	{
-		iterate();
-		
-		background(55);
-		
-		drawSprites();
-	}
-}
-
-function iterate()
-{
-	endTime = new Date();
-	elapsedTime = endTime - startTime;
-	elapsedTime = new Date(elapsedTime);
-			
-	/*if(keyWentUp('D'))
-		displayDebug();*/
-					
-	checkProblems(leftCars, savedLeftCars);
-	checkProblems(bottomCars, savedBottomCars);
-	//checkProblems(rightCars, savedRightCars);
-									
-	for(let i = leftCars.length - 1; i >= 0; i--)
-		leftCars[i].move(parking.walls, parking.spots, bottomCars[i], rightCars[i]);
-					
-	for(let i = bottomCars.length - 1; i >= 0; i--)
-		bottomCars[i].move(parking.walls, parking.spots, leftCars[i], rightCars[i]);
-					
-	/*for(let i = rightCars.length - 1; i >= 0; i--)
-		rightCars[i].move(parking.walls, parking.spots, leftCars[i], bottomCars[i]);*/
-			
-			
-	if(leftCars.length === 0 && bottomCars.length === 0 && rightCars.length === 0)
-	{
-		nextGeneration(leftCars, -500, 1140, 0, savedLeftCars, parking.spots);
-		nextGeneration(bottomCars, 515, 1375, -90, savedBottomCars, parking.spots);
-		//nextGeneration(rightCars, 1520, 1125, 180, savedRightCars, parking.spots);
-		startTime = endTime;
-	}
+    drawSprites();
+    
+    fill(255);
+    textSize(64);
+    text("Generations: " + nbGeneration, -1250, -100);	
+    text("Voitures gares: " + nbLastParked, -1250, 0);	
 }
 
 function checkProblems(cars, savedCars)
 {
 	for(let i = cars.length - 1; i >= 0; i--)
 	{
-		if(cars[i].blocked || cars[i].parked || cars[i].loop || (cars[i].noMove && elapsedTime.getSeconds() > 5))
+		if(cars[i].blocked || cars[i].loop || (cars[i].noMove && elapsedTime.getSeconds() > 5))
 		{
 			cars[i].sprite.remove();
 			savedCars.push(cars.splice(i, 1)[0]);
 		}
+        else if(cars[i].parked)
+        {
+            cars[i].sprite.remove();
+			savedCars.push(cars.splice(i, 1)[0]);
+            nbParked++;
+        }
 	}
 }
 
-function displayDebug()
+function iterate()
 {
-	for(let i = 0; i < cars.length; i++)
-        cars[i].sprite.debug = !cars[i].sprite.debug;
-	
-    for(let i = 0; i < parking.spots.length; i++)
-        parking.spots[i].sprite.debug = !parking.spots[i].sprite.debug;
-	
-	for(let i = 0; i < parking.wallsSprite.length; i++)
-        parking.wallsSprite[i].debug = !parking.wallsSprite[i].debug;
+    endTime = new Date();
+    elapsedTime = endTime - startTime;
+    elapsedTime = new Date(elapsedTime);
+
+    checkProblems(leftCars, savedLeftCars);
+    checkProblems(bottomCars, savedBottomCars);
+
+    for(let i = leftCars.length - 1; i >= 0; i--)
+        leftCars[i].move(parking.walls, parking.spots, bottomCars[i], rightCars[i]);
+
+    for(let i = bottomCars.length - 1; i >= 0; i--)
+        bottomCars[i].move(parking.walls, parking.spots, leftCars[i], rightCars[i]);
+
+    if(leftCars.length === 0 && bottomCars.length === 0 && rightCars.length === 0)
+    {
+        nextGeneration(leftCars, -500, 1140, 0, savedLeftCars, parking.spots);
+        nextGeneration(bottomCars, 515, 1375, -90, savedBottomCars, parking.spots);
+        startTime = endTime;
+        nbGeneration++;
+        nbLastParked = nbParked;
+        nbParked = 0;
+    }
 }

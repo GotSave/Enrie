@@ -19,7 +19,12 @@ function calculateFitness(savedCars)
         sum += savedCars[i].score;
     
     for(let i = 0; i < savedCars.length; i++)
-        savedCars[i].fitness = savedCars[i].score / sum;
+    {
+        if(savedCars[i].parked)
+            savedCars[i].fitness = 1;
+        else
+            savedCars[i].fitness = savedCars[i].score / sum;
+    }
 }
 
 function pickOne(x, y, savedCars, spots)

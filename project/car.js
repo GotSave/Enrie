@@ -38,8 +38,7 @@ class Car
         if(brain)
         {
             this.brain = brain.copy();
-			if(random(1) > 0.5)
-				this.brain.mutate(mutate);
+            this.brain.mutate(mutate);
         }
         else
             this.brain = new NeuralNetwork(10, 4, 4);
@@ -181,20 +180,9 @@ class Car
     
     saveBrain(brain)
     {
-        /*let json = {};
-        let i, h, o;
-        for(let a = 0; a < this.brain.inputs.length; a++)
-            i += this.brain.inputs[a] + " ";
-        for(let a = 0; a < this.brain.hidden.length; a++)
-            h += this.brain.hidden[a] + " ";
-        for(let a = 0; a < this.brain.outputs.length; a++)
-            o += this.brain.outputs[a] + " ";
-
-        json.inputs = i;
-        json.hidden = h;
-        json.outputs = o;
+        let json = this.brain.serialize();
         
-        saveJSON(json, 'brain');*/
+        saveJSON(json, 'brain');
     }
     
     checkParked()
@@ -222,7 +210,7 @@ class Car
     
     setScore(x)
     {
-        this.score = (1 / (Math.sqrt(0.2) * Math.sqrt(2 * PI))) * Math.exp((-1 / 2) * ((x / 0.2) * (x / 0.2)));
+        this.score = (1 / (0.4 * Math.sqrt(2 * PI))) * Math.exp((-1 / 2) * ((x * x) / (2 * 0.2 * 0.2)));
     }
 	
 	move(walls, spots, carGroup1, carGroup2)
