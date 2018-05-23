@@ -10,7 +10,7 @@ class Spot
 		this.available = false;
 	}
 	
-	init()
+	init(rotate)
 	{
 		let spotImage;
 		
@@ -20,6 +20,8 @@ class Spot
 			spotImage = loadImage("./assets/unavailableSpot.png");
 		
 		this.sprite = createSprite(this.x, this.y);
+        if(rotate)
+            this.sprite.rotation = 180;
 		
 		this.sprite.addImage("normal", spotImage);
 	}

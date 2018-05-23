@@ -12,7 +12,7 @@ function mutate(x)
 
 class Car
 {
-	constructor(x, y, spots, brain)
+	constructor(x, y, spots, brain, image)
 	{
 		this.sprite;
 		
@@ -32,13 +32,16 @@ class Car
 		
 		this.hMax = 1450;
         
+        this.image = image;
+        
         this.fitness = 0;
         this.score = 0;
 		
         if(brain)
         {
             this.brain = brain.copy();
-            this.brain.mutate(mutate);
+            if(Math.random() > 0.3)
+                this.brain.mutate(mutate);
         }
         else
             this.brain = new NeuralNetwork(10, 4, 4);
@@ -51,14 +54,11 @@ class Car
 	
 	createSprite(x, y)
 	{
-		const carImage = loadImage("./assets/car.png");
-		
 		this.sprite = createSprite(x, y);
-		this.sprite.addImage("normal", carImage);
+		this.sprite.addImage("normal", this.image);
 		
 		this.sprite.maxSpeed = 100000;
 		this.sprite.friction = .98;
-		this.sprite.scale = 0.2;
 		
 		this.sensors[0] = createVector(this.sprite.position.x + this.sprite.width / 2, this.sprite.position.y + this.sprite.height / 2);
 		this.sensors[1] = createVector(this.sprite.position.x + this.sprite.width / 2, this.sprite.position.y - this.sprite.height / 2);
@@ -198,7 +198,6 @@ class Car
             return;
         
         this.parked = true;
-        console.log(this.brain);
         this.saveBrain(this.brain);
 		this.score = 1;
 	}
@@ -213,11 +212,10 @@ class Car
         this.score = (1 / (0.4 * Math.sqrt(2 * PI))) * Math.exp((-1 / 2) * ((x * x) / (2 * 0.2 * 0.2)));
     }
 	
-	move(walls, spots, carGroup1, carGroup2)
+	move(walls, spots, carGroup1)
 	{
         this.checkBlocked(walls);
 		this.checkCollision(carGroup1);
-		this.checkCollision(carGroup2);
 		this.checkUnavailableSpot(spots);
 		
 		if(this.sprite.position.x > this.wMax || this.sprite.position.x < this.wMin)

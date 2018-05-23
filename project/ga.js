@@ -2,7 +2,7 @@ function nextGeneration(cars, x, y, r, savedCars, spots)
 {
     calculateFitness(savedCars);
     
-    for(let i = 0; i < TOTAL; i++)
+    for(let i = 0; i < total; i++)
     {
         cars.push(pickOne(x, y, savedCars, spots));
         cars[i].sprite.rotation = r;
@@ -30,37 +30,18 @@ function calculateFitness(savedCars)
 function pickOne(x, y, savedCars, spots)
 {
     let index = 0;
-    let r = random(1);
+    let r = Math.random();
     
     while(r > 0)
     {
         r = r - savedCars[index].fitness;      
         index++;
     }
+    
     index--;
     
     let car = savedCars[index];
-    let child = new Car(x, y, spots, car.brain);
+    let child = new Car(x, y, spots, car.brain, car.image);
     
     return child;
 }
-
-// peut etre utile pour trouver best fitness
-/*function searchBetter(savedCars, picked)
-{
-    let best = null;
-    let index = 0;
-    
-    for(let i = 0; i < savedCars.length; i++)
-    {
-        if(!picked.includes(i) && savedCars[i].fitness > best)
-        {
-            best = savedCars[i].fitness;
-            index = i;
-        }
-    }
-    
-    picked.push(index);
-    
-    return index;
-}*/

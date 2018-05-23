@@ -47,13 +47,14 @@ class Parking
 	
 	createRandomSpots()
 	{
-        for(let l = 0 ; l < 2 ; l++)
-        {            
-			for(let i = 0; i < this.nbrSpot; i++)
-				this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
+        for(let i = 0; i < this.nbrSpot; i++)
+            this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
 					
-            this.spotWidth = this.spotWidth + 1580;
-        }
+        this.spotWidth = this.spotWidth + 1580;
+        
+        for(let i = 0; i < this.nbrSpot; i++)
+            this.spots.push(new Spot(this.spotWidth / 2, i * this.spotHeight + this.spotHeight / 2));
+        
 		let picked = [];
 		while(picked.length != this.spotNumber)
 		{
@@ -66,6 +67,11 @@ class Parking
 		}
 		
 		for(let i = 0; i < this.maxSpots; i++)
-			this.spots[i].init();
+        {
+            if(i < this.maxSpots / 2)
+                this.spots[i].init(false);
+            else
+                this.spots[i].init(true);
+        }
 	}
 }
